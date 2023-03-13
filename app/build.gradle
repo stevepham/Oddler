@@ -46,7 +46,6 @@ android {
 }
 
 dependencies {
-    implementation Deps.AndroidX.core
     implementation Deps.Compose.activity
     implementation platform(Deps.Compose.bom)
     implementation Deps.Compose.ui
