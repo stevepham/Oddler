@@ -55,6 +55,10 @@ dependencies {
     implementation Deps.Compose.navigation
     implementation Deps.Compose.lifecycleRT
     implementation Deps.Compose.viewModel
+    implementation Deps.Compose.constraint
+    implementation Deps.Common.koinCompose
+
+    implementation project(":data")
 
     testImplementation Deps.Test.jUnit
     androidTestImplementation Deps.Test.extJunit
