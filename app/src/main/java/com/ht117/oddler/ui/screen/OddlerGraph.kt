@@ -11,7 +11,7 @@ import com.ht117.data.model.Product
 import com.ht117.oddler.R
 import com.ht117.oddler.ui.screen.add.AddProductScreen
 import com.ht117.oddler.ui.screen.detail.ProductDetailScreen
-import com.ht117.oddler.ui.screen.home.ProductListScreen
+import com.ht117.oddler.ui.screen.home.ProductListRoute
 import com.ht117.oddler.ui.screen.result.ResultScreen
 import com.ht117.oddler.ui.screen.update.UpdateProductScreen
 import kotlinx.serialization.decodeFromString
@@ -32,6 +32,7 @@ fun getCurrentDestiny(route: String?): OddlerDestiny? {
         OddlerDestiny.AddDestiny.route -> OddlerDestiny.AddDestiny
         OddlerDestiny.DetailDestiny.route -> OddlerDestiny.DetailDestiny
         OddlerDestiny.UpdateDestiny.route -> OddlerDestiny.UpdateDestiny
+        OddlerDestiny.ResultDestiny.route -> OddlerDestiny.ResultDestiny
         else -> null
     }
 }
@@ -42,7 +43,7 @@ fun OddlerGraph(controller: NavHostController, modifier: Modifier) {
         composable(
             route = OddlerDestiny.HomeDestiny.route
         ) {
-            ProductListScreen(controller = controller, modifier) {
+            ProductListRoute {
                 val json = Json.encodeToString(it)
                 controller.navigate("products/$json")
             }

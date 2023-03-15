@@ -6,4 +6,7 @@
     <string name="cancel">Cancel</string>
     <string name="update">Update</string>
     <string name="add_product">Add Product</string>
+    <string name="product_empty">There are no product found in store</string>
+    <string name="network_lost_err">Your connection has lost. Please try again!!!</string>
+    <string name="unknown_err">System has some unexpected error!!!</string>
 </resources>

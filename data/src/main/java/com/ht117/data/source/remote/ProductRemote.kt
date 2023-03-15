@@ -2,10 +2,9 @@ package com.ht117.data.source.remote
 
 import com.ht117.data.getRequest
 import com.ht117.data.handleError
-import com.ht117.data.model.AddProductRequest
 import com.ht117.data.model.DataResponse
 import com.ht117.data.model.Product
-import com.ht117.data.model.UpdateProductRequest
+import com.ht117.data.model.Request
 import com.ht117.data.patchRequest
 import com.ht117.data.postRequest
 import com.ht117.data.source.local.ConfigLocal
@@ -22,13 +21,13 @@ class ProductRemote(private val client: HttpClient) {
         }
     }.handleError()
 
-    fun addProduct(request: AddProductRequest) = flow {
+    fun addProduct(request: Request.AddProductRequest) = flow {
         val endPoint = ADD_PRODUCT_URL.format(ConfigLocal.getAccountID())
         val url = "${Remote.Host}$endPoint"
         postRequest(client, url, request)
     }.handleError()
 
-    fun updateProduct(request: UpdateProductRequest) = flow {
+    fun updateProduct(request: Request.UpdateProductRequest) = flow {
         val endPoint = UPDATE_PRODUCT_URL.format(ConfigLocal.getAccountID(), request.name)
         val url = "${Remote.Host}$endPoint"
         patchRequest(client, url, request)

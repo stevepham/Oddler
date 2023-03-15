@@ -23,7 +23,6 @@ suspend inline fun <reified T, D> FlowCollector<UiState<D>>.getRequest(
     url: String,
     crossinline converter: (T) -> D
 ) {
-    emit(UiState.Loading)
     val response = client.get(urlString = url)
     if (response.status.value in 200..299) {
         val body = response.body<T>()
@@ -38,7 +37,6 @@ suspend inline fun <reified R> FlowCollector<UiState<Boolean>>.postRequest(
     url: String,
     data: R
 ) {
-    emit(UiState.Loading)
     val response = client.post(url) {
         contentType(ContentType.Application.Json)
         setBody(data)
@@ -60,12 +58,10 @@ suspend inline fun <reified R> FlowCollector<UiState<Boolean>>.patchRequest(
     url: String,
     data: R,
 ) {
-    emit(UiState.Loading)
     val response = client.patch(url) {
         contentType(ContentType.Application.Json)
         setBody(data)
     }
-    HttpStatusCode
     if (response.status == HttpStatusCode.OK) {
         val body = response.body<ResultResponse>()
         if (body.success) {

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -132,10 +133,11 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp)
-                    .padding(bottom = 8.dp)
             ) {
                 Text(text = stringResource(id = R.string.cancel))
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -143,10 +145,11 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(64.dp)
-                    .padding(bottom = 16.dp)
             ) {
                 Text(text = stringResource(id = R.string.add_product))
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

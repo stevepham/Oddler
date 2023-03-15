@@ -26,6 +26,7 @@ object Deps {
         const val activity = "androidx.activity:activity-compose:1.6.1"
         const val navigation = "androidx.navigation:navigation-compose:2.5.3"
         const val lifecycleRT = "androidx.lifecycle:lifecycle-runtime-compose:2.6.0"
+        const val constraint = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
     }
 
     object Common {
