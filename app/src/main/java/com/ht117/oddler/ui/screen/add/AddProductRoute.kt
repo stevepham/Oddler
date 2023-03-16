@@ -140,7 +140,9 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
         ) {
             Button(
                 onClick = {
-                    controller.navigateUp()
+                    controller.navigate(OddlerDestiny.HomeDestiny.route) {
+                        popUpTo(OddlerDestiny.HomeDestiny.route)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -153,7 +155,8 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
 
             Button(
                 onClick = {
-                    val request = Request.AddProductRequest(txtName, txtPrice.toFloat(), txtDiscount.toFloat())
+                    val discount = txtDiscount.toFloatOrNull()?: 0F
+                    val request = Request.AddProductRequest(txtName, txtPrice.toFloat(), discount)
                     val json = Json.encodeToString(request)
                     controller.navigate("products/result/add/$json")
                 },

@@ -26,16 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ht117.data.model.AppErr
 import com.ht117.data.model.Request
 import com.ht117.data.model.UiState
 import com.ht117.oddler.R
+import com.ht117.oddler.ui.component.ErrorText
 import com.ht117.oddler.ui.screen.OddlerDestiny
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun ResultRoute(controller: NavHostController, modifier: Modifier, action: String, request: String) {
+fun ResultRoute(controller: NavHostController, action: String, request: String) {
 
     when (action) {
         "add" -> {
@@ -52,45 +54,45 @@ fun ResultRoute(controller: NavHostController, modifier: Modifier, action: Strin
 }
 
 @Composable
-fun AddProductResult(controller: NavHostController, req: Request.AddProductRequest, viewModel: ResultViewModel = koinViewModel()) {
+internal fun AddProductResult(controller: NavHostController, req: Request.AddProductRequest, viewModel: ResultViewModel = koinViewModel()) {
     LaunchedEffect(key1 = req, block = {
         viewModel.addProduct(req)
     })
 
-    when (viewModel.addUiState.collectAsState().value) {
+    when (val state = viewModel.addUiState.collectAsState().value) {
         is UiState.Loading -> {
             ShowLoading(controller)
         }
         is UiState.Failed -> {
-            ShowFailed(controller)
+            ShowFailed(controller, state.err)
         }
         is UiState.Success -> {
-            ShowSuccess(controller)
+            ShowSuccess(controller, req)
         }
     }
 }
 
 @Composable
-fun UpdateProductResult(controller: NavHostController, req: Request.UpdateProductRequest, viewModel: ResultViewModel = koinViewModel()) {
+internal fun UpdateProductResult(controller: NavHostController, req: Request.UpdateProductRequest, viewModel: ResultViewModel = koinViewModel()) {
     LaunchedEffect(key1 = req, block = {
         viewModel.updateProduct(req)
     })
 
-    when (viewModel.updateUiState.collectAsState().value) {
+    when (val state = viewModel.updateUiState.collectAsState().value) {
         is UiState.Loading -> {
             ShowLoading(controller = controller)
         }
         is UiState.Failed -> {
-            ShowFailed(controller)
+            ShowFailed(controller, state.err)
         }
         is UiState.Success -> {
-            ShowSuccess(controller)
+            ShowSuccess(controller, req)
         }
     }
 }
 
 @Composable
-fun ShowLoading(controller: NavHostController) {
+internal fun ShowLoading(controller: NavHostController) {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -110,7 +112,7 @@ fun ShowLoading(controller: NavHostController) {
         Text(
             text = stringResource(id = R.string.adding_product),
             modifier = Modifier.constrainAs(text) {
-                top.linkTo(loader.bottom)
+                top.linkTo(loader.bottom, margin = 16.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
@@ -135,7 +137,7 @@ fun ShowLoading(controller: NavHostController) {
 }
 
 @Composable
-fun ShowFailed(controller: NavHostController) {
+internal fun ShowFailed(controller: NavHostController, err: AppErr) {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -164,20 +166,18 @@ fun ShowFailed(controller: NavHostController) {
             textAlign = TextAlign.Center
         )
 
-        Text(
-            text = "Reason",
-            modifier = Modifier
-                .constrainAs(tvDetail) {
-                    top.linkTo(tvMsg.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .padding(top = 8.dp)
+        ErrorText(
+            modifier = Modifier.constrainAs(tvDetail) {
+                top.linkTo(tvMsg.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            err = err
         )
 
         Button(
             onClick = {
-
+                      // TODO retry
             }, modifier = Modifier
                 .constrainAs(btnRetry) {
                     bottom.linkTo(btnCancel.top)
@@ -195,7 +195,7 @@ fun ShowFailed(controller: NavHostController) {
 
         Button(
             onClick = {
-
+                controller.popBackStack()
             }, modifier = Modifier
                 .constrainAs(btnCancel) {
                     bottom.linkTo(parent.bottom)
@@ -211,7 +211,7 @@ fun ShowFailed(controller: NavHostController) {
 }
 
 @Composable
-fun ShowSuccess(controller: NavHostController) {
+internal fun ShowSuccess(controller: NavHostController, req: Request) {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -242,7 +242,9 @@ fun ShowSuccess(controller: NavHostController) {
 
         Button(
             onClick = {
-                controller.navigate(OddlerDestiny.AddDestiny.route)
+                controller.navigate(OddlerDestiny.AddDestiny.route) {
+                    popUpTo(OddlerDestiny.AddDestiny.route)
+                }
             },
             modifier = Modifier
                 .constrainAs(btnAddMore) {
@@ -259,7 +261,6 @@ fun ShowSuccess(controller: NavHostController) {
 
         Button(
             onClick = {
-
             },
             modifier = Modifier
                 .constrainAs(btnUpdate) {
@@ -276,7 +277,9 @@ fun ShowSuccess(controller: NavHostController) {
 
         Button(
             onClick = {
-                controller.navigateUp()
+                controller.navigate(OddlerDestiny.HomeDestiny.route) {
+                    popUpTo(OddlerDestiny.HomeDestiny.route)
+                }
             },
             modifier = Modifier
                 .constrainAs(btnDone) {
@@ -294,7 +297,7 @@ fun ShowSuccess(controller: NavHostController) {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewShowLoading() {
-    ShowFailed(controller = rememberNavController())
+internal fun PreviewShowLoading() {
+//    ShowFailed(controller = rememberNavController())
 //    ShowSuccess(rememberNavController())
 }
