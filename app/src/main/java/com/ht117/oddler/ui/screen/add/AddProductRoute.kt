@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -27,14 +28,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import com.ht117.data.model.Request
 import com.ht117.oddler.R
+import com.ht117.oddler.ui.screen.OddlerDestiny
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
+fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -62,7 +68,7 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
         ) {
             TextField(
                 value = txtName,
-                label = { Text(text = "Product Name") },
+                label = { Text(text = stringResource(id = R.string.product_name)) },
                 onValueChange = {
                     txtName = it
                 },
@@ -73,14 +79,17 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
 
             TextField(
                 value = txtPrice,
-                label = { Text(text = "Product Price") },
+                label = { Text(text = stringResource(id = R.string.product_price)) },
                 onValueChange = {
                     txtPrice = it
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Decimal
+                )
             )
 
             Box(
@@ -102,7 +111,10 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
                         .align(Alignment.CenterStart)
                         .fillMaxWidth()
                         .padding(end = 48.dp)
-                        .background(Color.Gray)
+                        .background(Color.Gray),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Decimal
+                    )
                 )
 
                 Box(
@@ -132,7 +144,7 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(48.dp)
             ) {
                 Text(text = stringResource(id = R.string.cancel))
             }
@@ -141,10 +153,14 @@ fun AddProductScreen(controller: NavHostController, modifier: Modifier) {
 
             Button(
                 onClick = {
+                    val request = Request.AddProductRequest(txtName, txtPrice.toFloat(), txtDiscount.toFloat())
+                    val json = Json.encodeToString(request)
+                    controller.navigate("products/result/add/$json")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(48.dp),
+                enabled = txtPrice.isNotEmpty() && txtName.isNotEmpty()
             ) {
                 Text(text = stringResource(id = R.string.add_product))
             }

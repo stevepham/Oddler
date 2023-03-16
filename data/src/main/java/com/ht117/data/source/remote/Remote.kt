@@ -39,7 +39,7 @@ object Remote {
         client.plugin(HttpSend).intercept { req ->
             val call = execute(req)
             if (BuildConfig.DEBUG) {
-                Log.d("Network", call.response.bodyAsText())
+                Log.d("Request", call.response.bodyAsText())
             }
             call
         }

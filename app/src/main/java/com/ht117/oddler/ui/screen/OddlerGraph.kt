@@ -9,11 +9,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.ht117.data.model.Product
 import com.ht117.oddler.R
-import com.ht117.oddler.ui.screen.add.AddProductScreen
-import com.ht117.oddler.ui.screen.detail.ProductDetailScreen
+import com.ht117.oddler.ui.screen.add.AddProductRoute
+import com.ht117.oddler.ui.screen.detail.ProductDetailRoute
 import com.ht117.oddler.ui.screen.home.ProductListRoute
-import com.ht117.oddler.ui.screen.result.ResultScreen
-import com.ht117.oddler.ui.screen.update.UpdateProductScreen
+import com.ht117.oddler.ui.screen.result.ResultRoute
+import com.ht117.oddler.ui.screen.update.UpdateProductRoute
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -23,7 +23,7 @@ sealed class OddlerDestiny(open val route: String, open val titleId: Int) {
     object AddDestiny : OddlerDestiny("products/add", R.string.product)
     object DetailDestiny : OddlerDestiny("products/{detail}", R.string.product)
     object UpdateDestiny : OddlerDestiny("products/{detail}/update", R.string.adjust_discount)
-    object ResultDestiny: OddlerDestiny("products/result", -1)
+    object ResultDestiny: OddlerDestiny("products/result/{action}/{request}", -1)
 }
 
 fun getCurrentDestiny(route: String?): OddlerDestiny? {
@@ -32,7 +32,6 @@ fun getCurrentDestiny(route: String?): OddlerDestiny? {
         OddlerDestiny.AddDestiny.route -> OddlerDestiny.AddDestiny
         OddlerDestiny.DetailDestiny.route -> OddlerDestiny.DetailDestiny
         OddlerDestiny.UpdateDestiny.route -> OddlerDestiny.UpdateDestiny
-        OddlerDestiny.ResultDestiny.route -> OddlerDestiny.ResultDestiny
         else -> null
     }
 }
@@ -58,7 +57,7 @@ fun OddlerGraph(controller: NavHostController, modifier: Modifier) {
         ) { entry ->
             entry.arguments?.getString("detail")?.let {
                 val product = Json.decodeFromString<Product>(it)
-                ProductDetailScreen(modifier = modifier, controller = controller, product = product)
+                ProductDetailRoute(modifier = modifier, controller = controller, product = product)
             }
         }
         composable(
@@ -71,18 +70,25 @@ fun OddlerGraph(controller: NavHostController, modifier: Modifier) {
         ) { entry ->
             entry.arguments?.getString("detail")?.let {
                 val product = Json.decodeFromString<Product>(it)
-                UpdateProductScreen(controller = controller, modifier = modifier, product = product)
+                UpdateProductRoute(controller = controller, modifier = modifier, product = product)
             }
         }
         composable(
             route = OddlerDestiny.AddDestiny.route
         ) {
-            AddProductScreen(controller, modifier)
+            AddProductRoute(controller, modifier)
         }
         composable(
-            route = OddlerDestiny.ResultDestiny.route
-        ) {
-            ResultScreen(controller, modifier)
+            route = OddlerDestiny.ResultDestiny.route,
+            arguments = listOf(
+                navArgument("action") { type = NavType.StringType },
+                navArgument("request") { type = NavType.StringType }
+            )
+        ) { entry ->
+            val action = entry.arguments?.getString("action")?: ""
+            val content = entry.arguments?.getString("request").orEmpty()
+
+            ResultRoute(controller = controller, modifier = modifier, action, content)
         }
     }
 }

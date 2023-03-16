@@ -1,15 +1,19 @@
 package com.ht117.oddler.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +45,7 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                     }
                     .padding(start = 8.dp),
                 text = product.name,
+                color = Color.Black
             )
 
             if (product.discount > 0) {
@@ -53,7 +58,8 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                             bottom.linkTo(parent.bottom)
                             end.linkTo(tvDiscounted.start)
                         }
-                        .padding(end = 8.dp)
+                        .padding(end = 8.dp),
+                    color = Color.Black
                 )
                 Text(
                     text = product.getDiscountedPrice(),
@@ -61,7 +67,8 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                         end.linkTo(parent.end, 8.dp)
-                    }
+                    },
+                    color = Color.Black
                 )
             } else {
                 Text(
@@ -72,7 +79,8 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                             bottom.linkTo(parent.bottom)
                             end.linkTo(parent.end)
                         }
-                        .padding(end = 8.dp)
+                        .padding(end = 8.dp),
+                    color = Color.Black
                 )
             }
         }

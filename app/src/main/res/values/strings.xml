@@ -9,4 +9,12 @@
     <string name="product_empty">There are no product found in store</string>
     <string name="network_lost_err">Your connection has lost. Please try again!!!</string>
     <string name="unknown_err">System has some unexpected error!!!</string>
+    <string name="product_name">Product Name</string>
+    <string name="product_price">Product Price</string>
+    <string name="adding_product">Adding Product</string>
+    <string name="failed_to_add_product">Failed to Add Product</string>
+    <string name="retry">Retry</string>
+    <string name="product_added">Product Added</string>
+    <string name="done">Done</string>
+    <string name="add_more_product">Add More Product</string>
 </resources>
