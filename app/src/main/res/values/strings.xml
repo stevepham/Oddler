@@ -17,4 +17,6 @@
     <string name="product_added">Product Added</string>
     <string name="done">Done</string>
     <string name="add_more_product">Add More Product</string>
+    <string name="product_update">Discount Adjusted</string>
+    <string name="updating_product">Adjusting Discount</string>
 </resources>

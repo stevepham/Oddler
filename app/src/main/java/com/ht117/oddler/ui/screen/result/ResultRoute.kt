@@ -61,7 +61,7 @@ internal fun AddProductResult(controller: NavHostController, req: Request.AddPro
 
     when (val state = viewModel.addUiState.collectAsState().value) {
         is UiState.Loading -> {
-            ShowLoading(controller)
+            ShowLoading(controller, req)
         }
         is UiState.Failed -> {
             ShowFailed(controller, state.err)
@@ -80,7 +80,7 @@ internal fun UpdateProductResult(controller: NavHostController, req: Request.Upd
 
     when (val state = viewModel.updateUiState.collectAsState().value) {
         is UiState.Loading -> {
-            ShowLoading(controller = controller)
+            ShowLoading(controller, req)
         }
         is UiState.Failed -> {
             ShowFailed(controller, state.err)
@@ -92,7 +92,7 @@ internal fun UpdateProductResult(controller: NavHostController, req: Request.Upd
 }
 
 @Composable
-internal fun ShowLoading(controller: NavHostController) {
+internal fun ShowLoading(controller: NavHostController, req: Request) {
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -110,7 +110,11 @@ internal fun ShowLoading(controller: NavHostController) {
         )
 
         Text(
-            text = stringResource(id = R.string.adding_product),
+            text = stringResource(id = if (req is Request.AddProductRequest) {
+                R.string.adding_product
+            } else {
+                R.string.updating_product
+            }),
             modifier = Modifier.constrainAs(text) {
                 top.linkTo(loader.bottom, margin = 16.dp)
                 start.linkTo(parent.start)
@@ -231,7 +235,13 @@ internal fun ShowSuccess(controller: NavHostController, req: Request) {
         )
 
         Text(
-            text = stringResource(id = R.string.product_added),
+            text = stringResource(
+                id = if (req is Request.AddProductRequest) {
+                    R.string.product_added
+                } else {
+                    R.string.product_update
+                }
+            ),
             modifier = Modifier.constrainAs(tvMsg) {
                 top.linkTo(icon.bottom, margin = 16.dp)
                 start.linkTo(parent.start)
@@ -240,39 +250,41 @@ internal fun ShowSuccess(controller: NavHostController, req: Request) {
             textAlign = TextAlign.Center
         )
 
-        Button(
-            onClick = {
-                controller.navigate(OddlerDestiny.AddDestiny.route) {
-                    popUpTo(OddlerDestiny.AddDestiny.route)
-                }
-            },
-            modifier = Modifier
-                .constrainAs(btnAddMore) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(btnUpdate.top)
-                }
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-        ) {
-            Text(text = stringResource(id = R.string.add_more_product))
-        }
+        if (req is Request.AddProductRequest) {
+            Button(
+                onClick = {
+                    controller.navigate(OddlerDestiny.AddDestiny.route) {
+                        popUpTo(OddlerDestiny.AddDestiny.route)
+                    }
+                },
+                modifier = Modifier
+                    .constrainAs(btnAddMore) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(btnUpdate.top)
+                    }
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            ) {
+                Text(text = stringResource(id = R.string.add_more_product))
+            }
 
-        Button(
-            onClick = {
-            },
-            modifier = Modifier
-                .constrainAs(btnUpdate) {
-                    bottom.linkTo(btnDone.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-        ) {
-            Text(text = stringResource(id = R.string.adjust_discount))
+            Button(
+                onClick = {
+                },
+                modifier = Modifier
+                    .constrainAs(btnUpdate) {
+                        bottom.linkTo(btnDone.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            ) {
+                Text(text = stringResource(id = R.string.adjust_discount))
+            }
         }
 
         Button(

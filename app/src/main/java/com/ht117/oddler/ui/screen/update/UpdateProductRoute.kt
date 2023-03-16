@@ -31,9 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.ht117.data.model.Product
+import com.ht117.data.model.Request
 import com.ht117.data.model.getRawPrice
 import com.ht117.oddler.R
 import com.ht117.oddler.ui.component.TextItem
+import com.ht117.oddler.ui.screen.OddlerDestiny
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -119,7 +121,9 @@ fun UpdateProductRoute(controller: NavHostController, modifier: Modifier, produc
         ) {
             Button(
                 onClick = {
-                    controller.navigateUp()
+                    controller.navigate(OddlerDestiny.HomeDestiny.route) {
+                        popUpTo(OddlerDestiny.HomeDestiny.route)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,10 +136,15 @@ fun UpdateProductRoute(controller: NavHostController, modifier: Modifier, produc
 
             Button(
                 onClick = {
-                    val json = Json.encodeToString(product)
-                    val route = "products/$json/update"
+                    val discount = txtDiscount.toFloatOrNull()?: 0F
 
-                    controller.navigate(route)
+                    if (discount != product.discount) {
+                        val req = Request.UpdateProductRequest(product.name, discount)
+                        val json = Json.encodeToString(req)
+                        controller.navigate("products/result/update/$json")
+                    } else {
+                        // Show error message
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
