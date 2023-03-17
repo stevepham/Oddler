@@ -26,6 +26,7 @@ import com.ht117.data.model.Request
 import com.ht117.oddler.R
 import com.ht117.oddler.ui.component.OddlerButton
 import com.ht117.oddler.ui.component.PercentItem
+import com.ht117.oddler.ui.screen.OddlerDestiny
 import com.ht117.oddler.ui.theme.horizon
 import com.ht117.oddler.ui.theme.vertical
 import kotlinx.serialization.encodeToString
@@ -103,7 +104,9 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
         ) {
             OddlerButton(
                 onClick = {
-                    controller.navigateUp()
+                    controller.navigate(OddlerDestiny.HomeDestiny.route) {
+                        popUpTo(OddlerDestiny.HomeDestiny.route)
+                    }
                 },
                 isEnable = { true }, txtId = R.string.cancel
             )
