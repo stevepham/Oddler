@@ -42,7 +42,6 @@ object Deps {
         const val serializeJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
         const val ktorContent = "io.ktor:ktor-client-content-negotiation:2.1.3"
         const val ktorJson = "io.ktor:ktor-serialization-kotlinx-json:2.1.3"
-        const val coilCompose = "io.coil-kt:coil-compose:2.2.2"
     }
 
     object Test {
