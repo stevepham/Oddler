@@ -23,8 +23,8 @@ fun TextItem(modifier: Modifier, text: String, isEnable: Boolean) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .padding(8.dp)
+            .height(72.dp)
+            .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(8.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
             .background(if (isEnable) Color.White else Color.Gray),

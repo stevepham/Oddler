@@ -1,18 +1,15 @@
 package com.ht117.oddler.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +26,7 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .height(48.dp),
+            .height(64.dp),
         onClick = { onItemClick.invoke(product) }) {
         ConstraintLayout (
             modifier = Modifier.fillMaxSize()

@@ -11,26 +11,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ht117.data.model.AppErr
 import com.ht117.data.model.Product
 import com.ht117.data.model.UiState
 import com.ht117.oddler.R
-import com.ht117.oddler.ui.component.ErrorText
+import com.ht117.oddler.ui.component.OddlerErrorText
 import com.ht117.oddler.ui.component.ProductItem
+import com.ht117.oddler.ui.theme.horizon
+import com.ht117.oddler.ui.theme.vertical
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -70,8 +67,8 @@ internal fun ProductListFailed(err: AppErr, viewModel: ProductListViewModel) {
                     viewModel.refresh()
                 }
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        ErrorText(err = err, modifier = Modifier)
+        Spacer(modifier = Modifier.height(vertical))
+        OddlerErrorText(err = err, modifier = Modifier)
     }
 }
 
@@ -90,14 +87,14 @@ internal fun ProductListResult(modifier: Modifier, products: List<Product>, item
                     .width(64.dp)
                     .height(64.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(vertical))
             Text(text = stringResource(id = R.string.product_empty))
         }
     } else {
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(start = 8.dp, end = 8.dp),
+                .padding(horizontal = horizon),
             verticalArrangement = Arrangement.Top
         ) {
             items(products.size) {
@@ -106,10 +103,4 @@ internal fun ProductListResult(modifier: Modifier, products: List<Product>, item
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewError() {
-//    ProductListFailed(err = AppErr.NoNetworkErr)
 }

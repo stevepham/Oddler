@@ -1,20 +1,13 @@
 package com.ht117.oddler.ui.screen.add
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -23,10 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -34,7 +24,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.ht117.data.model.Request
 import com.ht117.oddler.R
-import com.ht117.oddler.ui.screen.OddlerDestiny
+import com.ht117.oddler.ui.component.OddlerButton
+import com.ht117.oddler.ui.component.PercentItem
+import com.ht117.oddler.ui.theme.horizon
+import com.ht117.oddler.ui.theme.vertical
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -44,7 +37,7 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = horizon)
     ) {
         val (topItem, bottomItem) = createRefs()
         var txtName by remember {
@@ -60,11 +53,10 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
         Column(
             modifier = Modifier
                 .constrainAs(topItem) {
-                    top.linkTo(parent.top, margin = 8.dp)
+                    top.linkTo(parent.top, margin = vertical)
                 }
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(horizontal = 8.dp)
         ) {
             TextField(
                 value = txtName,
@@ -86,48 +78,19 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .padding(top = 16.dp),
+                    .padding(top = vertical),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Decimal
                 )
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .padding(top = 16.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray)
-                    .border(1.dp, Color.Black, RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                TextField(
-                    value = txtDiscount,
-                    onValueChange = {
-                        txtDiscount = it
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .fillMaxWidth()
-                        .padding(end = 48.dp)
-                        .background(Color.Gray),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Decimal
-                    )
-                )
-
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .fillMaxHeight()
-                        .border(1.dp, Color.Black, RoundedCornerShape(8.dp))
-                        .align(Alignment.CenterEnd),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "%", color = Color.White)
-                }
-            }
+            PercentItem(
+                modifier = Modifier,
+                percent = txtDiscount,
+                isEditable = true,
+                onValueChange = {
+                    txtDiscount = it
+                })
         }
 
         Column(
@@ -138,37 +101,27 @@ fun AddProductRoute(controller: NavHostController, modifier: Modifier) {
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            Button(
+            OddlerButton(
                 onClick = {
-                    controller.navigate(OddlerDestiny.HomeDestiny.route) {
-                        popUpTo(OddlerDestiny.HomeDestiny.route)
-                    }
+                    controller.navigateUp()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-            ) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
+                isEnable = { true }, txtId = R.string.cancel
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Button(
+            OddlerButton(
                 onClick = {
-                    val discount = txtDiscount.toFloatOrNull()?: 0F
+                    val discount = txtDiscount.toFloatOrNull() ?: 0F
                     val request = Request.AddProductRequest(txtName, txtPrice.toFloat(), discount)
                     val json = Json.encodeToString(request)
                     controller.navigate("products/result/add/$json")
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                enabled = txtPrice.isNotEmpty() && txtName.isNotEmpty()
-            ) {
-                Text(text = stringResource(id = R.string.add_product))
-            }
+                isEnable = { txtPrice.isNotEmpty() && txtName.isNotEmpty() },
+                txtId = R.string.add_product
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(vertical))
         }
     }
 }

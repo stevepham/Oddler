@@ -1,50 +1,47 @@
 package com.ht117.oddler.ui.screen.result
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Done
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ht117.data.model.AppErr
+import com.ht117.data.model.Product
 import com.ht117.data.model.Request
-import com.ht117.data.model.UiState
 import com.ht117.oddler.R
-import com.ht117.oddler.ui.component.ErrorText
+import com.ht117.oddler.ui.component.OddlerButton
+import com.ht117.oddler.ui.component.OddlerErrorText
 import com.ht117.oddler.ui.screen.OddlerDestiny
+import com.ht117.oddler.ui.screen.result.add.AddProductResult
+import com.ht117.oddler.ui.screen.result.update.UpdateProductResult
+import com.ht117.oddler.ui.theme.horizon
+import com.ht117.oddler.ui.theme.maxVertical
+import com.ht117.oddler.ui.theme.vertical
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.koin.androidx.compose.koinViewModel
+
+private const val ACTION_ADD = "add"
+private const val ACTION_UPDATE = "update"
 
 @Composable
-fun ResultRoute(controller: NavHostController, action: String, request: String) {
-
+fun ResultRoute(controller: NavHostController, action: String, request: String, hasDelay: Boolean = false) {
     when (action) {
-        "add" -> {
+        ACTION_ADD -> {
             val req = Json.decodeFromString<Request.AddProductRequest>(request)
             AddProductResult(controller, req)
         }
-        "update" -> {
+        ACTION_UPDATE -> {
             val req = Json.decodeFromString<Request.UpdateProductRequest>(request)
             UpdateProductResult(controller, req)
         }
@@ -54,47 +51,11 @@ fun ResultRoute(controller: NavHostController, action: String, request: String) 
 }
 
 @Composable
-internal fun AddProductResult(controller: NavHostController, req: Request.AddProductRequest, viewModel: ResultViewModel = koinViewModel()) {
-    LaunchedEffect(key1 = req, block = {
-        viewModel.addProduct(req)
-    })
-
-    when (val state = viewModel.addUiState.collectAsState().value) {
-        is UiState.Loading -> {
-            ShowLoading(controller, req)
-        }
-        is UiState.Failed -> {
-            ShowFailed(controller, state.err)
-        }
-        is UiState.Success -> {
-            ShowSuccess(controller, req)
-        }
-    }
-}
-
-@Composable
-internal fun UpdateProductResult(controller: NavHostController, req: Request.UpdateProductRequest, viewModel: ResultViewModel = koinViewModel()) {
-    LaunchedEffect(key1 = req, block = {
-        viewModel.updateProduct(req)
-    })
-
-    when (val state = viewModel.updateUiState.collectAsState().value) {
-        is UiState.Loading -> {
-            ShowLoading(controller, req)
-        }
-        is UiState.Failed -> {
-            ShowFailed(controller, state.err)
-        }
-        is UiState.Success -> {
-            ShowSuccess(controller, req)
-        }
-    }
-}
-
-@Composable
 internal fun ShowLoading(controller: NavHostController, req: Request) {
     ConstraintLayout(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = horizon)
     ) {
         val (loader, text, btnCancel) = createRefs()
         CircularProgressIndicator(
@@ -110,40 +71,41 @@ internal fun ShowLoading(controller: NavHostController, req: Request) {
         )
 
         Text(
-            text = stringResource(id = if (req is Request.AddProductRequest) {
-                R.string.adding_product
-            } else {
-                R.string.updating_product
-            }),
+            text = stringResource(
+                id = if (req is Request.AddProductRequest) {
+                    R.string.adding_product
+                } else {
+                    R.string.updating_product
+                }
+            ),
             modifier = Modifier.constrainAs(text) {
-                top.linkTo(loader.bottom, margin = 16.dp)
+                top.linkTo(loader.bottom, margin = maxVertical)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
             textAlign = TextAlign.Center
         )
 
-        Button(
-            onClick = {
-                controller.navigateUp()
-            }, modifier = Modifier
+        OddlerButton(
+            modifier = Modifier
                 .constrainAs(btnCancel) {
-                    bottom.linkTo(parent.bottom)
+                    bottom.linkTo(parent.bottom, margin = maxVertical)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)) {
-            Text(text = stringResource(id = R.string.cancel))
-        }
+                },
+            onClick = { controller.navigateUp() },
+            isEnable = { true },
+            txtId = R.string.cancel
+        )
     }
 }
 
 @Composable
-internal fun ShowFailed(controller: NavHostController, err: AppErr) {
+internal fun ShowFailed(controller: NavHostController, err: AppErr, req: Request, viewModel: ResultViewModel) {
     ConstraintLayout(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
     ) {
         val (icon, tvMsg, tvDetail, btnCancel, btnRetry) = createRefs()
         Image(
@@ -163,14 +125,14 @@ internal fun ShowFailed(controller: NavHostController, err: AppErr) {
         Text(
             text = stringResource(id = R.string.failed_to_add_product),
             modifier = Modifier.constrainAs(tvMsg) {
-                top.linkTo(icon.bottom, margin = 16.dp)
+                top.linkTo(icon.bottom, margin = maxVertical)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
             textAlign = TextAlign.Center
         )
 
-        ErrorText(
+        OddlerErrorText(
             modifier = Modifier.constrainAs(tvDetail) {
                 top.linkTo(tvMsg.bottom)
                 start.linkTo(parent.start)
@@ -179,45 +141,43 @@ internal fun ShowFailed(controller: NavHostController, err: AppErr) {
             err = err
         )
 
-        Button(
+        OddlerButton(
+            modifier = Modifier.constrainAs(btnRetry) {
+                bottom.linkTo(btnCancel.top, margin = vertical)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
             onClick = {
-                      // TODO retry
-            }, modifier = Modifier
-                .constrainAs(btnRetry) {
-                    bottom.linkTo(btnCancel.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                if (req is Request.AddProductRequest) {
+                    val json = Json.encodeToString(req)
+                    controller.navigate("products/result/add/$json")
+                } else if (req is Request.UpdateProductRequest) {
+                    val json = Json.encodeToString(req)
+                    controller.navigate("products/result/update/$json")
                 }
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-        ) {
-            Text(text = stringResource(id = R.string.retry))
-        }
+            },
+            isEnable = { true },
+            txtId = R.string.retry
+        )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                controller.popBackStack()
-            }, modifier = Modifier
-                .constrainAs(btnCancel) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)) {
-            Text(text = stringResource(id = R.string.cancel))
-        }
+        OddlerButton(
+            modifier = Modifier.constrainAs(btnCancel) {
+                bottom.linkTo(parent.bottom, margin = maxVertical)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
+            onClick = { controller.popBackStack() },
+            isEnable = { true },
+            txtId = R.string.cancel)
     }
 }
 
 @Composable
 internal fun ShowSuccess(controller: NavHostController, req: Request) {
     ConstraintLayout(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = horizon)
     ) {
         val (icon, tvMsg, btnAddMore, btnUpdate, btnDone) = createRefs()
         Image(
@@ -243,7 +203,7 @@ internal fun ShowSuccess(controller: NavHostController, req: Request) {
                 }
             ),
             modifier = Modifier.constrainAs(tvMsg) {
-                top.linkTo(icon.bottom, margin = 16.dp)
+                top.linkTo(icon.bottom, margin = maxVertical)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             },
@@ -251,65 +211,50 @@ internal fun ShowSuccess(controller: NavHostController, req: Request) {
         )
 
         if (req is Request.AddProductRequest) {
-            Button(
+            OddlerButton(
+                modifier = Modifier.constrainAs(btnAddMore) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(btnUpdate.top, margin = vertical)
+                },
                 onClick = {
                     controller.navigate(OddlerDestiny.AddDestiny.route) {
                         popUpTo(OddlerDestiny.AddDestiny.route)
                     }
                 },
-                modifier = Modifier
-                    .constrainAs(btnAddMore) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(btnUpdate.top)
-                    }
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-            ) {
-                Text(text = stringResource(id = R.string.add_more_product))
-            }
+                isEnable = { true },
+                txtId = R.string.add_more_product
+            )
 
-            Button(
-                onClick = {
+            OddlerButton(
+                modifier = Modifier.constrainAs(btnUpdate) {
+                    bottom.linkTo(btnDone.top, margin = vertical)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 },
-                modifier = Modifier
-                    .constrainAs(btnUpdate) {
-                        bottom.linkTo(btnDone.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-            ) {
-                Text(text = stringResource(id = R.string.adjust_discount))
-            }
+                onClick = {
+                    val product = Product(req.name, req.price, req.discount)
+                    val json = Json.encodeToString(product)
+                    controller.navigate("products/$json/update")
+                },
+                isEnable = { true },
+                txtId = R.string.adjust_discount
+            )
         }
 
-        Button(
+        OddlerButton(
+            modifier = Modifier.constrainAs(btnDone) {
+                bottom.linkTo(parent.bottom, margin = maxVertical)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            },
             onClick = {
                 controller.navigate(OddlerDestiny.HomeDestiny.route) {
                     popUpTo(OddlerDestiny.HomeDestiny.route)
                 }
             },
-            modifier = Modifier
-                .constrainAs(btnDone) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)) {
-            Text(text = stringResource(id = R.string.done))
-        }
+            isEnable = { true },
+            txtId = R.string.done
+        )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-internal fun PreviewShowLoading() {
-//    ShowFailed(controller = rememberNavController())
-//    ShowSuccess(rememberNavController())
 }
