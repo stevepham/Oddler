@@ -35,3 +35,5 @@ List of features that build in this app
 
 ## Demo
 ![Demo gift](assets/demo.gif)
+![Delete product](assets/delete.gif)
+

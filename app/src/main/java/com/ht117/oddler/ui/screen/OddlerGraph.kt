@@ -42,10 +42,7 @@ fun OddlerGraph(controller: NavHostController, modifier: Modifier) {
         composable(
             route = OddlerDestiny.HomeDestiny.route
         ) {
-            ProductListRoute(modifier) {
-                val json = Json.encodeToString(it)
-                controller.navigate("products/$json")
-            }
+            ProductListRoute(controller, modifier)
         }
         composable(
             route = OddlerDestiny.DetailDestiny.route,

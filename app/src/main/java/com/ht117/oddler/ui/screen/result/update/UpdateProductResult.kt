@@ -34,5 +34,6 @@ internal fun UpdateProductResult(
         is UiState.Success -> {
             ShowSuccess(controller, req)
         }
+        else -> {}
     }
 }

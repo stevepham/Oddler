@@ -1,10 +1,12 @@
 package com.ht117.data
 
+import android.util.Log
 import com.ht117.data.model.AppErr
 import com.ht117.data.model.ResultResponse
 import com.ht117.data.model.UiState
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
@@ -67,6 +69,26 @@ suspend inline fun <reified R> FlowCollector<UiState<Boolean>>.patchRequest(
         if (body.success) {
             emit(UiState.Success(true))
         } else {
+            emit(UiState.Failed(AppErr.UnknownErr(Throwable(body.error))))
+        }
+    } else {
+        processError(response)
+    }
+}
+
+suspend inline fun FlowCollector<UiState<Boolean>>.deleteRequest(
+    client: HttpClient,
+    url: String
+) {
+    Log.d("DaFuck", "deleting product $url")
+    val response = client.delete(urlString = url)
+    if (response.status == HttpStatusCode.OK) {
+        val body = response.body<ResultResponse>()
+        if (body.success) {
+            Log.d("DaFuck", "Deleted")
+            emit(UiState.Success(true))
+        } else {
+            Log.d("DaFuck", "Failed ${body.error}")
             emit(UiState.Failed(AppErr.UnknownErr(Throwable(body.error))))
         }
     } else {

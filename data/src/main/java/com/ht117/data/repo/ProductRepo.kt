@@ -12,6 +12,8 @@ interface IProductRepo{
     fun addProduct(request: Request.AddProductRequest): Flow<UiState<Boolean>>
 
     fun updateProduct(request: Request.UpdateProductRequest): Flow<UiState<Boolean>>
+
+    fun deleteProduct(productName: String): Flow<UiState<Boolean>>
 }
 
 class ProductRepoImpl(private val remote: ProductRemote): IProductRepo {
@@ -20,5 +22,7 @@ class ProductRepoImpl(private val remote: ProductRemote): IProductRepo {
     override fun addProduct(request: Request.AddProductRequest) = remote.addProduct(request)
 
     override fun updateProduct(request: Request.UpdateProductRequest) = remote.updateProduct(request)
+
+    override fun deleteProduct(productName: String) = remote.deleteProduct(productName)
 
 }

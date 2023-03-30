@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -21,7 +23,10 @@ import com.ht117.data.model.getRawPrice
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
+fun ProductItem(product: Product,
+                isDeleting: Boolean = false,
+                onItemClick: (Product) -> Unit,
+                actionClick: (Product) -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .padding(8.dp)
@@ -31,7 +36,12 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
         ConstraintLayout (
             modifier = Modifier.fillMaxSize()
         ) {
-            val (tvName, tvPrice, tvDiscounted) = createRefs()
+            val (tvName,
+                tvPrice,
+                tvDiscounted,
+                btnAction,
+                loader
+            ) = createRefs()
 
             Text(
                 modifier = Modifier
@@ -63,7 +73,11 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                     modifier = Modifier.constrainAs(tvDiscounted) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, 8.dp)
+                        if (isDeleting) {
+                            end.linkTo(loader.start, 8.dp)
+                        } else {
+                            end.linkTo(btnAction.start, 8.dp)
+                        }
                     },
                     color = Color.Black
                 )
@@ -74,11 +88,38 @@ fun ProductItem(product: Product, onItemClick: (Product) -> Unit) {
                         .constrainAs(tvPrice) {
                             top.linkTo(parent.top)
                             bottom.linkTo(parent.bottom)
-                            end.linkTo(parent.end)
+                            if (isDeleting) {
+                                end.linkTo(loader.start)
+                            } else {
+                                end.linkTo(btnAction.start)
+                            }
                         }
                         .padding(end = 8.dp),
                     color = Color.Black
                 )
+            }
+
+            if (isDeleting) {
+                CircularProgressIndicator(
+                    modifier = Modifier.constrainAs(loader) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 8.dp)
+                    }
+                        .width(32.dp)
+                        .height(32.dp)
+                )
+            } else {
+                Button(
+                    modifier = Modifier.constrainAs(btnAction) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 8.dp)
+                    },
+                    onClick = { actionClick.invoke(product) }
+                ) {
+                    Text(text = "Action")
+                }
             }
         }
     }
@@ -94,9 +135,9 @@ fun PreviewProduct() {
         Product("Pullower", 90F, 10F)
     )
 
-    LazyColumn {
-        items(products.size) {
-            ProductItem(product = products[it], onItemClick = {})
-        }
-    }
+//    LazyColumn {
+//        items(products.size) {
+//            ProductItem(product = products[it], onItemClick = {})
+//        }
+//    }
 }
